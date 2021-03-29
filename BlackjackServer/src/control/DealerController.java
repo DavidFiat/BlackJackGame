@@ -89,7 +89,8 @@ public class DealerController implements OnMessageListener, OnConnectionListener
 			Gson gson = new Gson();
 			Event message = gson.fromJson(msg, Event.class);
 			if (message.getType().equals("Give")) {
-				connection.turn(message.getAux());
+				if ((!Player1Paused && !Player2Paused))
+					connection.turn(message.getAux());
 				Collections.shuffle(cards);
 				connection.dispenseCard(cards.get(0), message.getAux());
 				cards.remove(0);
@@ -110,8 +111,10 @@ public class DealerController implements OnMessageListener, OnConnectionListener
 				int i = Integer.parseInt(message.getAux());
 				if (i == 0) {
 					Player1Paused = true;
+					connection.turn("" + 0);
 				} else {
 					Player2Paused = true;
+					connection.turn("" + 1);
 				}
 			}
 		});
@@ -126,30 +129,29 @@ public class DealerController implements OnMessageListener, OnConnectionListener
 		Gson gson = new Gson();
 		String lostt = gson.toJson(lost);
 		String wonn = gson.toJson(won);
-		boolean cases = false;
 		if (Player1Sum > 21) {
 			connection.getSessions().get(0).getEmisor().sendMessage(lostt);
 			// connection.getSessions().get(1).getEmisor().sendMessage(wonn);
-			cases = true;
-
+			Player1Paused = true;
 		} else if (Player1Sum == 21) {
 			connection.getSessions().get(0).getEmisor().sendMessage(wonn);
 			// connection.getSessions().get(1).getEmisor().sendMessage(lostt);
-			cases = true;
+			Player1Paused = true;
+
 		}
 
 		if (Player2Sum > 21) {
 			// connection.getSessions().get(0).getEmisor().sendMessage(wonn);
 			connection.getSessions().get(1).getEmisor().sendMessage(lostt);
-			cases = true;
+			Player2Paused = true;
+
 		} else if (Player2Sum == 21) {
 			connection.getSessions().get(1).getEmisor().sendMessage(wonn);
 			// connection.getSessions().get(0).getEmisor().sendMessage(lostt);
-			cases = true;
-		}
-		if (cases == true) {
+			Player2Paused = true;
 
 		}
+
 	}
 
 }
