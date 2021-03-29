@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import comm.TCPConnection;
 import comm.TCPConnection.OnConnectionListener;
 import javafx.application.Platform;
+import main.Launcher;
 import model.Card;
 import model.Event;
 import view.DealerWindow;
@@ -21,12 +22,16 @@ public class DealerController implements OnMessageListener, OnConnectionListener
 	private ArrayList<Card> cards;
 	private int Player1Sum;
 	private int Player2Sum;
+	private boolean Player1Paused;
+	private boolean Player2Paused;
 
 	public DealerController(DealerWindow view) {
 		this.view = view;
+		Player1Sum = 0;
+		Player2Sum = 0;
+		Player1Paused = false;
+		Player2Paused = false;
 		init();
-		System.out.println(Player1Sum);
-		System.out.println(Player2Sum);
 	}
 
 	public void init() {
@@ -99,28 +104,49 @@ public class DealerController implements OnMessageListener, OnConnectionListener
 				}
 				gameStatus();
 
+			} else if (message.getType().equals("Stand")) {
+				int i = Integer.parseInt(message.getAux());
+				if (i == 0) {
+					Player1Paused = true;
+				} else {
+					Player2Paused = true;
+				}
 			}
 		});
 
 	}
 
 	private void gameStatus() {
-		String message = "";
-		if (Player1Sum > 21) {
-			message = "You lost";
-		} else if (Player1Sum == 21) {
-			message = "You won";
-		}
+		String los = "lost";
+		String wo = "won";
+		Event lost = new Event("lost");
+		Event won = new Event("won");
 		Gson gson = new Gson();
-		String stat = gson.toJson(message);
-		connection.getSessions().get(0).getEmisor().sendMessage(message);
-		message = "";
-		if (Player2Sum > 21) {
-			message = "You lost";
-		} else if (Player2Sum == 21) {
-			message = "You won";
+		String lostt = gson.toJson(lost);
+		String wonn = gson.toJson(won);
+		boolean cases = false;
+		if (Player1Sum > 21) {
+			connection.getSessions().get(0).getEmisor().sendMessage(lostt);
+			connection.getSessions().get(1).getEmisor().sendMessage(wonn);
+			cases = true;
+
+		} else if (Player1Sum == 21) {
+			connection.getSessions().get(0).getEmisor().sendMessage(wonn);
+			connection.getSessions().get(1).getEmisor().sendMessage(lostt);
+			cases = true;
 		}
-		connection.getSessions().get(1).getEmisor().sendMessage(message);
+
+		if (Player2Sum > 21) {
+			connection.getSessions().get(0).getEmisor().sendMessage(wonn);
+			connection.getSessions().get(1).getEmisor().sendMessage(lostt);
+			cases = true;
+		} else if (Player2Sum == 21) {
+			connection.getSessions().get(1).getEmisor().sendMessage(wonn);
+			connection.getSessions().get(0).getEmisor().sendMessage(lostt);
+			cases = true;
+		}
+		if (cases == true)
+			Launcher.main(null);
 	}
 
 }

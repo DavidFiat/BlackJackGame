@@ -9,6 +9,7 @@ import comm.TCPConnection.OnConnectionListener;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import main.Launcher;
 import model.Card;
 import model.Event;
 import view.PlayerWindow;
@@ -56,6 +57,24 @@ public class PlayerController implements OnMessageListener, OnConnectionListener
 						Gson gson1 = new Gson();
 						String json = gson1.toJson(new Event("Sum", message.getAux() + "-" + sum));
 						connection.getEmisor().sendMessage(json);
+					} else if (message.getType().equals("won")) {
+						Alert alert = new Alert(AlertType.INFORMATION);
+						alert.setTitle("Ganador!");
+						alert.setHeaderText("Has ganado el juego.");
+						alert.setContentText("Has llegado a 21 o eres el más cercano.");
+						alert.showAndWait();
+						view.close();
+						Launcher.main(null);
+
+					} else if (message.getType().equals("lost")) {
+						Alert alert = new Alert(AlertType.INFORMATION);
+						alert.setTitle("Perdedor!");
+						alert.setHeaderText("Has perdido el juego.");
+						alert.setContentText("El otro jugador se acercó más o te has pasado de 21.");
+						alert.showAndWait();
+						view.close();
+						Launcher.main(null);
+
 					} else {
 						Card message1 = gson.fromJson(msg, Card.class);
 						if (message1.getType().equals("Card")) {
@@ -128,13 +147,15 @@ public class PlayerController implements OnMessageListener, OnConnectionListener
 
 	public void takeCard() {
 		Gson gson = new Gson();
-		String json = gson.toJson(new Event("Give", "" + usuario));
+		String json = gson.toJson(new Event("Give", usuario));
 		connection.getEmisor().sendMessage(json);
 
 	}
 
 	public void stand() {
-
+		Gson gson = new Gson();
+		String json = gson.toJson(new Event("Stand", usuario));
+		connection.getEmisor().sendMessage(json);
 	}
 
 }

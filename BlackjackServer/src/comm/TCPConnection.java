@@ -27,7 +27,7 @@ public class TCPConnection extends Thread {
 		}
 		return instance;
 	}
-	
+
 	public ArrayList<Session> getSessions() {
 		return sessions;
 	}
@@ -141,6 +141,12 @@ public class TCPConnection extends Thread {
 		sessions.get(0).getEmisor().sendMessage(json1);
 		sessions.get(1).getEmisor().sendMessage(json2);
 		sessions.get(1).getEmisor().sendMessage(json3);
+
+		json = gson.toJson(new Event("Active"));
+		sessions.get(0).getEmisor().sendMessage(json);
+		json = gson.toJson(new Event("Disactive"));
+		sessions.get(1).getEmisor().sendMessage(json);
+
 		checkSum();
 
 	}
@@ -164,7 +170,7 @@ public class TCPConnection extends Thread {
 	public void getSum(int i) {
 		Gson gson5 = new Gson();
 		String json5 = gson5.toJson(new Event("Sum", i + ""));
-		sessions.get(i-1).getEmisor().sendMessage(json5);
+		sessions.get(i - 1).getEmisor().sendMessage(json5);
 
 	}
 
