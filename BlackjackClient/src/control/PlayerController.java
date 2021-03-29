@@ -64,7 +64,6 @@ public class PlayerController implements OnMessageListener, OnConnectionListener
 						alert.setContentText("Has llegado a 21 o eres el más cercano.");
 						alert.showAndWait();
 						view.close();
-						Launcher.main(null);
 
 					} else if (message.getType().equals("lost")) {
 						Alert alert = new Alert(AlertType.INFORMATION);
@@ -73,8 +72,11 @@ public class PlayerController implements OnMessageListener, OnConnectionListener
 						alert.setContentText("El otro jugador se acercó más o te has pasado de 21.");
 						alert.showAndWait();
 						view.close();
-						Launcher.main(null);
 
+					} else if (message.getType().equals("Active")) {
+						view.getScene().getRoot().setDisable(false);
+					} else if (message.getType().equals("Disactive")) {
+						view.getScene().getRoot().setDisable(true);
 					} else {
 						Card message1 = gson.fromJson(msg, Card.class);
 						if (message1.getType().equals("Card")) {

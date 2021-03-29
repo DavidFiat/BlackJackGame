@@ -141,7 +141,6 @@ public class TCPConnection extends Thread {
 		sessions.get(0).getEmisor().sendMessage(json1);
 		sessions.get(1).getEmisor().sendMessage(json2);
 		sessions.get(1).getEmisor().sendMessage(json3);
-
 		json = gson.toJson(new Event("Active"));
 		sessions.get(0).getEmisor().sendMessage(json);
 		json = gson.toJson(new Event("Disactive"));
@@ -171,6 +170,21 @@ public class TCPConnection extends Thread {
 		Gson gson5 = new Gson();
 		String json5 = gson5.toJson(new Event("Sum", i + ""));
 		sessions.get(i - 1).getEmisor().sendMessage(json5);
+
+	}
+
+	public void turn(String user) {
+		int us = Integer.parseInt(user) - 1;
+		Gson gson = new Gson();
+		String json1 = gson.toJson(new Event("Active"));
+		String json2 = gson.toJson(new Event("Disactive"));
+		if (us == 0) {
+			sessions.get(1).getEmisor().sendMessage(json1);
+			sessions.get(0).getEmisor().sendMessage(json2);
+		} else {
+			sessions.get(1).getEmisor().sendMessage(json2);
+			sessions.get(0).getEmisor().sendMessage(json1);
+		}
 
 	}
 
